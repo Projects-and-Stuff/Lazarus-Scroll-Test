@@ -18,6 +18,7 @@ type
   TForm1 = class(TForm)
     btnSetMax: TButton;
     btnQuery: TButton;
+    chkInitial: TCheckBox;
     DataSource1: TDataSource;
     Label2: TLabel;
     lblCurrentChunk: TLabel;
@@ -37,7 +38,6 @@ type
     RichMemo1: TRichMemo;
     ScrollBar1: TScrollBar;
     procedure btnQueryClick(Sender: TObject);
-    procedure btnSetMaxClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure RichMemo1Change(Sender: TObject);
@@ -60,7 +60,7 @@ type
   public
     { public declarations }
   const
-    FChunkSize : Integer = 60;            // Number of records per chunk
+    FChunkSize : Integer = 10;            // Number of records per chunk
   end;
 
 var
@@ -80,7 +80,10 @@ var
   linesCurrentChunkSet : Integer;
 
   FTempCurrentChunk : Integer;
+  scrollingDone : Boolean;
 begin
+
+  scrollingDone := False;
 
   // linesCurrentChunkSet := FChunkLineCounts[FCurrentChunk-1] + FChunkLineCounts[FCurrentChunk] + FChunkLineCounts[FCurrentChunk+1];
 
@@ -104,41 +107,50 @@ begin
     scLineDown : ScrollPos := ScrollPos + smallStep - 1;
     scPageUp : ScrollPos := ScrollPos - (smallStep * FPageSize);
     scPageDown : ScrollPos := ScrollPos + (smallStep * FPageSize);
+    scEndScroll : scrollingDone := True;
+    scBottom : scrollingDone := True;
+    scTop : scrollingDone := True;
   end;
 
 
   // Calculate the current chunk based upon current scrollbar position
   FTempCurrentChunk := (((Scrollbar1.Position div 1000) div FChunkSize) + 1);
 
-  // We only update the richmemo contents if we've moved to a new chunk
-  if (FTempCurrentChunk > FCurrentChunk) and (FTempCurrentChunk < FChunksCount - 1) then
+  if scrollingDone then
   begin
-    FCurrentChunk := FTempCurrentChunk;
-    performQuery(FCurrentChunk, False);
+    // We only update the richmemo contents if we've moved to a new chunk
+    if (FTempCurrentChunk > FCurrentChunk) and (FTempCurrentChunk < FChunksCount - 1) then
+    begin
+      ///ShowMessage('FTempCurrentChunk ' + IntToStr(FTempCurrentChunk) + ' > FCurrentChunk ' + IntToStr(FCurrentChunk));
 
-    // Move the caret to the start of new middle chunk
-    // By taking the count of the chunk above it
-    MoveToLine(FChunkLineCounts[FCurrentChunk-1] + 1);
+      FCurrentChunk := FTempCurrentChunk;
+      performQuery(FCurrentChunk, False);
 
-    ShowMessage(IntToStr(FTempCurrentChunk) + ' > ' + IntToStr(FCurrentChunk));
-  end
-  else if (FTempCurrentChunk < FCurrentChunk) and (FTempCurrentChunk < FChunksCount - 1) then
-  begin
-    FCurrentChunk := FTempCurrentChunk;
-    performQuery(FCurrentChunk, False);
+      // Move the caret to the start of new middle chunk
+      // By taking the count of the chunk above it
+      MoveToLine(FChunkLineCounts[FCurrentChunk-1]);
 
-    // Move the caret to the end of new middle chunk
-    // By taking the line counts of the current chunk and the one above it
-    MoveToLine(FChunkLineCounts[FCurrentChunk-1] + FChunkLineCounts[FCurrentChunk] + 1);
 
-    ShowMessage(IntToStr(FCurrentChunk) + ' > ' + IntToStr(FTempCurrentChunk));
-  end
-  else
-  begin
-    // Move the caret
-    MoveToLine(ScrollBar1.Position div ((ScrollBar1.Max div FChunksCount) div RichMemo1.Lines.Count));
+    end
+    else if (FTempCurrentChunk < FCurrentChunk) and (FTempCurrentChunk < FChunksCount - 1) then
+    begin
+      ///ShowMessage('FTempCurrentChunk ' + IntToStr(FTempCurrentChunk) + ' < FCurrentChunk ' + IntToStr(FCurrentChunk));
+
+      FCurrentChunk := FTempCurrentChunk;
+      performQuery(FCurrentChunk, False);
+
+      // Move the caret to the end of new middle chunk
+      // By taking the line counts of the current chunk and the one above it
+      MoveToLine(FChunkLineCounts[FCurrentChunk-1] + FChunkLineCounts[FCurrentChunk]);
+
+
+    end
+    else
+    begin
+      // Move the caret
+      //MoveToLine(ScrollBar1.Position div ((ScrollBar1.Max div FChunksCount) div RichMemo1.Lines.Count));
+    end;
   end;
-
 
   // Move the caret
   //MoveToLine(ScrollBar1.Position div ((ScrollBar1.Max div FChunksCount) div RichMemo1.Lines.Count));
@@ -149,6 +161,7 @@ begin
   // correlate with lines 0 through linesCurrentChunkSet
 
   // if we're at position 9200, we're about half-way through chunk 3
+
 
 
   lblCurrentChunk.Caption := IntToStr(FCurrentChunk);
@@ -215,13 +228,6 @@ begin
   lblScrollPos.Caption := IntToStr(ScrollBar1.Position);
 end;
 
-procedure TForm1.btnSetMaxClick(Sender: TObject);
-begin
-  ScrollBar1.Max := StrToInt(txtSetMax.Text);
-  lblScrollMax.Caption := IntToStr(ScrollBar1.Max);
-  lblScrollPos.Caption := IntToStr(ScrollBar1.Position);
-end;
-
 procedure TForm1.FormResize(Sender: TObject);
 begin
   // Approximates how many lines are in the visible memo area
@@ -233,7 +239,6 @@ var
   i, currLines : Integer;
   queryCurrentChunk : Integer;
 begin
-  RichMemo1.Lines.Clear;
 
   SQLite3Connection1.Close;
   SQLite3Connection1.DatabaseName := './DB/DBTest.db3';
@@ -242,7 +247,9 @@ begin
   SQLite3Connection1.Open;
   SQLTransaction1.Active := True;
 
-  RichMemo1.Visible := False;
+  RichMemo1.Lines.BeginUpdate;
+  //RichMemo1.Visible := False;
+  RichMemo1.Lines.Clear;
   //ScrollBar1.Visible := False;
 
   if resetQuery = True then
@@ -292,9 +299,9 @@ begin
           while (RecNo < (((queryCurrentChunk) * FChunkSize) + 1)) AND (RecNo < FRecCount) do
           begin
 
-            RichMemo1.Lines.Add('Entry ID: ' + FieldByName('id').AsString + ' - Name: ' + FieldByName('Name').AsString);
-            RichMemo1.Lines.Add('Entry: ' + FieldByName('Entry').AsString);
-            RichMemo1.Lines.Add('');
+            RichMemo1.Lines.Append('Entry ID: ' + FieldByName('id').AsString + ' - Name: ' + FieldByName('Name').AsString);
+            RichMemo1.Lines.Append('Entry: ' + FieldByName('Entry').AsString);
+            RichMemo1.Lines.Append('');
             //ShowMessage(IntToStr(RecNo));
             //FLineCounts[RecNo-1] := RichMemo1.Lines.Count - currLines;
 
@@ -330,28 +337,7 @@ begin
 
       Open;
 
-      // Need to call Last in order to get accurate total record count
-      Last;
-      FRecCount := RecordCount;
-
-      ScrollBar1.Max := FRecCount * 1000;
-      lblScrollMax.Caption := IntToStr(ScrollBar1.Max);
-      //SetLength(FLineCounts, FRecCount);
-
-      // Count the number of chunks
-      if FRecCount mod FChunkSize = 0 then
-      begin
-        FChunksCount := FRecCount div FChunkSize;
-        SetLength(FChunkLineCounts, FRecCount div FChunkSize);
-      end
-      else
-      begin
-        FChunksCount := (FRecCount div FChunkSize) + 1;
-        SetLength(FChunkLineCounts, (FRecCount div FChunkSize) + 1);
-      end;
-
-      First;
-      //UniDirectional := True;
+      // We skip the whole 'Last' part here because we already counted the records on the initial query
 
       // Pull the first 3 chunks
       for i := (queryCenterChunk - 1) to (queryCenterChunk + 1) do
@@ -367,9 +353,9 @@ begin
           while (RecNo < (((queryCurrentChunk) * FChunkSize) + 1)) AND (RecNo < FRecCount) do
           begin
 
-            RichMemo1.Lines.Add('Entry ID: ' + FieldByName('id').AsString + ' - Name: ' + FieldByName('Name').AsString);
-            RichMemo1.Lines.Add('Entry: ' + FieldByName('Entry').AsString);
-            RichMemo1.Lines.Add('');
+            RichMemo1.Lines.Append('Entry ID: ' + FieldByName('id').AsString + #9#9 + ' Name: ' + FieldByName('Name').AsString);
+            RichMemo1.Lines.Append('Entry: ' + FieldByName('Entry').AsString);
+            RichMemo1.Lines.Append('');
             //ShowMessage(IntToStr(RecNo));
             //FLineCounts[RecNo-1] := RichMemo1.Lines.Count - currLines;
 
@@ -396,9 +382,10 @@ begin
 
 
 
+  //RichMemo1.Visible := True;
+  RichMemo1.Lines.EndUpdate;
+  //ScrollBar1.Visible := True;
 
-  RichMemo1.Visible := True;
-  ScrollBar1.Visible := True;
 
   SQLTransaction1.Commit;
   SQLTransaction1.StartTransaction;
@@ -418,12 +405,22 @@ procedure TForm1.btnQueryClick(Sender: TObject);
 var
   dontCare : Integer;
 begin
-  performQuery(StrToInt(txtNumber.Text), False);
+  if chkInitial.Checked then
+  begin
+    performQuery(StrToInt(txtNumber.Text), True);
+  end
+  else
+  begin
+    performQuery(StrToInt(txtNumber.Text), False);
+  end;
+
   ScrollBar1Scroll(nil, scTop, dontCare);
+
+  chkInitial.Checked := False;
 end;
 
 function TForm1.GetVisibleLineCount(Memo: TRichMemo): Integer;
-Var
+var
   OldFont : HFont;
   Hand : THandle;
   TM : TTextMetric;
@@ -443,6 +440,7 @@ begin
   end;
   Result := tempint;
 end;
+
 
 end.
 
