@@ -1,0 +1,306 @@
+object Form1: TForm1
+  Left = 389
+  Height = 576
+  Top = 156
+  Width = 781
+  Caption = 'Form1'
+  ClientHeight = 576
+  ClientWidth = 781
+  OnResize = FormResize
+  OnShow = FormShow
+  LCLVersion = '1.2.4.0'
+  object ScrollBar1: TScrollBar
+    AnchorSideLeft.Control = RichMemo1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 564
+    Height = 444
+    Top = 66
+    Width = 17
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Left = 1
+    BorderSpacing.Top = 66
+    BorderSpacing.Right = 200
+    BorderSpacing.Bottom = 66
+    Kind = sbVertical
+    Max = 10000
+    PageSize = 0
+    TabOrder = 0
+    OnScroll = ScrollBar1Scroll
+  end
+  object RichMemo1: TRichMemo
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = ScrollBar1
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 66
+    Height = 444
+    Top = 66
+    Width = 497
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 66
+    BorderSpacing.Top = 66
+    BorderSpacing.Bottom = 66
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Pitch = fpFixed
+    Font.Quality = fqDraft
+    HideSelection = False
+    Lines.Strings = (
+      'Set the max to the number of records returned from the query * 100.'
+      ''
+      'For every page down, move the scrollbar by 100 to the next record.'
+      ''
+      'If the user clicks the arrow, move record.lines div 100.'
+      ''
+      'Need to keep track of the user cursor position in case the user is moving through the '
+      'richmemo using the keys.'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '1'
+      ''
+      ''
+      ''
+      ''
+      '2'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '3'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '4'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '5'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '6'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '7'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '8'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '9'
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      ''
+      '0'
+      ''
+    )
+    OnChange = RichMemo1Change
+    OnKeyDown = RichMemo1KeyDown
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssAutoHorizontal
+    TabOrder = 1
+    WordWrap = False
+  end
+  object Label1: TLabel
+    Left = 616
+    Height = 15
+    Top = 208
+    Width = 46
+    Caption = 'Position:'
+    ParentColor = False
+  end
+  object lblScrollPos: TLabel
+    Left = 672
+    Height = 15
+    Top = 208
+    Width = 6
+    Caption = '0'
+    ParentColor = False
+  end
+  object txtSetMax: TEdit
+    Left = 648
+    Height = 23
+    Top = 304
+    Width = 80
+    TabOrder = 2
+    Text = '1000'
+  end
+  object Label3: TLabel
+    Left = 643
+    Height = 15
+    Top = 288
+    Width = 34
+    Caption = 'Label3'
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 617
+    Height = 15
+    Top = 193
+    Width = 50
+    Caption = 'ScollMax:'
+    ParentColor = False
+  end
+  object lblScrollMax: TLabel
+    Left = 672
+    Height = 15
+    Top = 193
+    Width = 6
+    Caption = '0'
+    ParentColor = False
+  end
+  object btnSetMax: TButton
+    Left = 648
+    Height = 25
+    Top = 344
+    Width = 78
+    Caption = 'btnSetMax'
+    OnClick = btnSetMaxClick
+    TabOrder = 3
+  end
+  object lblMemoLineViaScrollBar: TLabel
+    Left = 672
+    Height = 15
+    Top = 224
+    Width = 6
+    Caption = '0'
+    ParentColor = False
+  end
+  object Label7: TLabel
+    Left = 617
+    Height = 15
+    Top = 249
+    Width = 68
+    Caption = 'Current Line:'
+    ParentColor = False
+  end
+  object lblCaretPosLine: TLabel
+    Left = 692
+    Height = 15
+    Top = 250
+    Width = 6
+    Caption = '0'
+    ParentColor = False
+  end
+  object btnQuery: TButton
+    Left = 640
+    Height = 25
+    Top = 488
+    Width = 75
+    Caption = 'Query'
+    OnClick = btnQueryClick
+    TabOrder = 4
+  end
+  object txtNumber: TEdit
+    Left = 641
+    Height = 23
+    Top = 466
+    Width = 80
+    TabOrder = 5
+    Text = '1'
+  end
+  object Label2: TLabel
+    Left = 615
+    Height = 15
+    Top = 160
+    Width = 78
+    Caption = 'CurrentChunk:'
+    ParentColor = False
+  end
+  object lblCurrentChunk: TLabel
+    Left = 701
+    Height = 15
+    Top = 160
+    Width = 6
+    Caption = '0'
+    ParentColor = False
+  end
+  object DataSource1: TDataSource
+    left = 319
+    top = 1
+  end
+  object SQLQuery1: TSQLQuery
+    PacketRecords = 100
+    FieldDefs = <>
+    Database = SQLite3Connection1
+    Transaction = SQLTransaction1
+    Params = <>
+    left = 240
+    top = 1
+  end
+  object SQLite3Connection1: TSQLite3Connection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    Transaction = SQLTransaction1
+    LogEvents = []
+    Options = []
+    left = 40
+    top = 1
+  end
+  object SQLTransaction1: TSQLTransaction
+    Active = False
+    Database = SQLite3Connection1
+    left = 152
+    top = 1
+  end
+end
