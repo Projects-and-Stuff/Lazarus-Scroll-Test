@@ -9,7 +9,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, SynEdit, RichMemo, Forms, Controls, Graphics,
-  Dialogs, StdCtrls, windows, types, sqlite3conn, sqldb, db;
+  Dialogs, StdCtrls, ExtCtrls, VirtualDBScrollMemo, windows, types, sqlite3conn,
+  sqldb, db;
 
 type
 
@@ -37,7 +38,9 @@ type
     lblCaretPosLine: TLabel;
     RichMemo1: TRichMemo;
     ScrollBar1: TScrollBar;
+    VirtualDBScrollMemo1: TVirtualDBScrollMemo;
     procedure btnQueryClick(Sender: TObject);
+    procedure btnSetMaxClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure RichMemo1Change(Sender: TObject);
@@ -417,6 +420,8 @@ begin
   ScrollBar1Scroll(nil, scTop, dontCare);
 
   chkInitial.Checked := False;
+
+
 end;
 
 function TForm1.GetVisibleLineCount(Memo: TRichMemo): Integer;

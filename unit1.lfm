@@ -214,6 +214,7 @@ object Form1: TForm1
     Top = 344
     Width = 78
     Caption = 'btnSetMax'
+    OnClick = btnSetMaxClick
     TabOrder = 3
   end
   object lblMemoLineViaScrollBar: TLabel
@@ -280,6 +281,26 @@ object Form1: TForm1
     Width = 84
     Caption = 'Initial Query'
     TabOrder = 6
+  end
+  object VirtualDBScrollMemo1: TVirtualDBScrollMemo
+    Left = 467
+    Height = 50
+    Top = 18
+    Width = 170
+    EmbeddedMemo.Left = 1
+    EmbeddedMemo.Height = 48
+    EmbeddedMemo.Top = 1
+    EmbeddedMemo.Width = 151
+    EmbeddedScrollBar.Left = 152
+    EmbeddedScrollBar.Height = 48
+    EmbeddedScrollBar.Top = 1
+    EmbeddedScrollBar.Width = 17
+    EmbeddedScrollBar.Align = alRight
+    EmbeddedScrollBar.Kind = sbVertical
+    EmbeddedScrollBar.PageSize = 0
+    EmbeddedScrollBar.TabOrder = 1
+    TabOrder = 7
+    UseDockManager = True
   end
   object DataSource1: TDataSource
     left = 319
